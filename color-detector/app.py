@@ -9,18 +9,20 @@ from streamlit_image_coordinates import streamlit_image_coordinates
 def load_colors():
     df = pd.read_csv("colors.csv")
     return df
+
 color_data = load_colors()
+
+# Display sample data
 st.write("🎨 Loaded Color Data Sample:")
 st.dataframe(color_data.head())
 
-# Find closest color name
+# Function to find the closest color name
 def get_color_name(R, G, B, color_data):
     min_dist = float('inf')
     closest_color = None
     for _, row in color_data.iterrows():
         try:
-           d = ((R - int(row['R']))**2 + (G - int(row['G']))**2 + (B - int(row['B']))**2) * 0.5  # Euclidean distance
-
+            d = ((R - int(row['R']))**2 + (G - int(row['G']))**2 + (B - int(row['B']))**2) * 0.5
             if d < min_dist:
                 min_dist = d
                 closest_color = row
@@ -31,10 +33,8 @@ def get_color_name(R, G, B, color_data):
         'hex': '#000000'
     }
 
-# Streamlit UI
+# Streamlit App UI
 st.title("🎨 Color Detection from Image (No OpenCV)")
-
-
 uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -52,10 +52,6 @@ if uploaded_file is not None:
             r, g, b = image_np[y, x]
             st.write(f"🎨 Clicked Pixel RGB: ({r}, {g}, {b})")
 
-            color_data = load_colors()
-            st.write("🎨 Loaded Color Data Sample:")
-            st.dataframe(color_data.head())
-
             color_info = get_color_name(r, g, b, color_data)
             hex_color = color_info['hex']
 
@@ -68,4 +64,4 @@ if uploaded_file is not None:
             <div style="width:100px; height:50px; background-color:{hex_color}; border:1px solid #000;"></div>
             """, unsafe_allow_html=True)
         else:
-            st.warning("Clicked outside image bounds.")
+            st.warning("⚠️ Clicked outside image bounds.")
